@@ -1,0 +1,22 @@
+{
+  "name": "koishi-plugin-slave-market",
+  "description": "大奴隶时代",
+  "version": "1.0.1",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "dist"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "chatbot",
+    "koishi",
+    "plugin",
+    "game",
+    "slave-market"
+  ],
+  "peerDependencies": {
+    "koishi": "4.18.7"
+  }
+}
