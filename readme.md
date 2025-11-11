@@ -1,8 +1,8 @@
 # koishi-plugin-slave-market
 
+> 本项目基于原版 [koishi-plugin-slave-market](https://www.npmjs.com/package/koishi-plugin-slave-market) 重新制作，以下为原版 npm 信息：
 [![npm](https://img.shields.io/npm/v/koishi-plugin-slave-market?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-slave-market)
 
-[![爱发电](https://img.shields.io/badge/爱发电-支持作者-FF4D4D?style=flat-square)](https://afdian.com/item/fd7899e40b2711f0a67d52540025c377)
 
 大牛马时代 🐂🐎 - 一个基于 Koishi 的群聊游戏插件
 
@@ -48,11 +48,26 @@
 
 如果您喜欢这个插件，可以通过以下方式支持作者：
 
-1. 访问 [爱发电](https://afdian.com/item/fd7899e40b2711f0a67d52540025c377) 进行购买
+1. 在游戏中发送 `赞助` 指令或直接扫描插件根目录 (`./ai.png`) 中的赞赏码
 2. 选择您想要的支持方案
-3. 完成支付后，您将获得相应的支持者权益
+3. 完成支付后，您将获得相应的支持者权益（VIP 卡密）
+
+> 插件会从自身目录下的 `ai.png` 读取赞赏码，部署时可用自己的图片覆盖该文件。
 
 您的支持将帮助我们持续改进插件，添加更多有趣的功能！
+
+## 本地 VIP 卡密配置
+
+出于安全考虑，真实卡密不会写入仓库。请在插件根目录创建 `vip-cards.json`（已加入 `.gitignore`），内容为字符串数组，例如：
+
+```json
+[
+  "VIP2025_EXAMPLE_1",
+  "VIP2025_EXAMPLE_2"
+]
+```
+
+可以将仓库附带的 `vip-cards.example.json` 复制并修改，然后重启 Koishi 即可生效。
 
 ## 使用说明
 
