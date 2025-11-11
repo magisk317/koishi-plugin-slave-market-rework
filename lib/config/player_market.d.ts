@@ -9,7 +9,7 @@ export interface Config {
     中介费: number;
     赎身提升: number;
     打工基础收入: number;
-    奴隶主加成: number;
+    牛马主加成: number;
     购买冷却: number;
     打工冷却: number;
     抢劫冷却: number;
@@ -43,7 +43,7 @@ export interface Config {
         工作收入倍率: number;
     };
     管理员列表: string[];
-    奴隶福利: {
+    牛马福利: {
         基础福利比例: number;
         等级加成: number;
         培训费用比例: number;
@@ -59,7 +59,7 @@ export declare const Config: Schema<Schemastery.ObjectS<{
     中介费: Schema<number, number>;
     赎身提升: Schema<number, number>;
     打工基础收入: Schema<number, number>;
-    奴隶主加成: Schema<number, number>;
+    牛马主加成: Schema<number, number>;
     购买冷却: Schema<number, number>;
     打工冷却: Schema<number, number>;
     抢劫冷却: Schema<number, number>;
@@ -114,7 +114,7 @@ export declare const Config: Schema<Schemastery.ObjectS<{
         工作收入倍率: Schema<number, number>;
     }>>;
     管理员列表: Schema<string[], string[]>;
-    奴隶福利: Schema<Schemastery.ObjectS<{
+    牛马福利: Schema<Schemastery.ObjectS<{
         基础福利比例: Schema<number, number>;
         等级加成: Schema<number, number>;
         培训费用比例: Schema<number, number>;
@@ -134,7 +134,7 @@ export declare const Config: Schema<Schemastery.ObjectS<{
     中介费: Schema<number, number>;
     赎身提升: Schema<number, number>;
     打工基础收入: Schema<number, number>;
-    奴隶主加成: Schema<number, number>;
+    牛马主加成: Schema<number, number>;
     购买冷却: Schema<number, number>;
     打工冷却: Schema<number, number>;
     抢劫冷却: Schema<number, number>;
@@ -189,7 +189,7 @@ export declare const Config: Schema<Schemastery.ObjectS<{
         工作收入倍率: Schema<number, number>;
     }>>;
     管理员列表: Schema<string[], string[]>;
-    奴隶福利: Schema<Schemastery.ObjectS<{
+    牛马福利: Schema<Schemastery.ObjectS<{
         基础福利比例: Schema<number, number>;
         等级加成: Schema<number, number>;
         培训费用比例: Schema<number, number>;

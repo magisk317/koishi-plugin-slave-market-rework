@@ -1,6 +1,6 @@
 {
   "name": "koishi-plugin-slave-market",
-  "description": "大奴隶时代",
+  "description": "大牛马时代 🐂🐎",
   "version": "1.0.1",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
