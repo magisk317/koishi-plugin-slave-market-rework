@@ -1,7 +1,7 @@
 {
-  "name": "koishi-plugin-slave-market",
-  "description": "大牛马时代 🐂🐎",
-  "version": "1.0.1",
+  "name": "koishi-plugin-slave-market-enhanced",
+  "description": "大牛马时代 🐂🐎（增强版）",
+  "version": "1.1.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -14,7 +14,8 @@
     "koishi",
     "plugin",
     "game",
-    "slave-market"
+    "slave-market",
+    "enhanced"
   ],
   "peerDependencies": {
     "koishi": "4.18.7"

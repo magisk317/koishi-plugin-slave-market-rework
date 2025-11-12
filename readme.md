@@ -1,7 +1,7 @@
-# koishi-plugin-slave-market
+# koishi-plugin-slave-market-enhanced
 
-> 本项目基于原版 [koishi-plugin-slave-market](https://www.npmjs.com/package/koishi-plugin-slave-market) 重新制作，以下为原版 npm 信息：
-[![npm](https://img.shields.io/npm/v/koishi-plugin-slave-market?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-slave-market)
+> 本项目基于原版 [koishi-plugin-slave-market](https://www.npmjs.com/package/koishi-plugin-slave-market) 重新制作，新增消息撤回、图像渲染等增强功能。原版 npm 信息可参考上方链接。
+[![npm](https://img.shields.io/npm/v/koishi-plugin-slave-market-enhanced?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-slave-market-enhanced)
 
 
 大牛马时代 🐂🐎 - 一个基于 Koishi 的群聊游戏插件
@@ -30,7 +30,7 @@
 
 1. 安装插件
    ```bash
-   npm install koishi-plugin-slave-market
+   npm install koishi-plugin-slave-market-enhanced
    ```
 2. 在 Koishi 配置文件中启用插件
    ```js
