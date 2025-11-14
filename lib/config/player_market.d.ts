@@ -61,6 +61,7 @@ export interface Config {
         培训费用比例: number;
         培训冷却: number;
     };
+    调试日志: boolean;
     注册激励: {
         启用: boolean;
         开始时间: string;
@@ -164,6 +165,7 @@ export declare const Config: Schema<Schemastery.ObjectS<{
         培训费用比例: Schema<number, number>;
         培训冷却: Schema<number, number>;
     }>>;
+    调试日志: Schema<boolean, boolean>;
     注册激励: Schema<Schemastery.ObjectS<{
         启用: Schema<boolean, boolean>;
         开始时间: Schema<string, string>;
