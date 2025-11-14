@@ -29,6 +29,7 @@ export declare const Config: Schema<Schemastery.ObjectS<{
     初始身价: Schema<number, number>;
     初始存款上限: Schema<number, number>;
     初始信用等级: Schema<number, number>;
+    自动注册: Schema<boolean, boolean>;
     赎身倍率: Schema<number, number>;
     中介费: Schema<number, number>;
     赎身提升: Schema<number, number>;
@@ -40,6 +41,19 @@ export declare const Config: Schema<Schemastery.ObjectS<{
     转账冷却: Schema<number, number>;
     种地冷却: Schema<number, number>;
     抢劫成功率: Schema<number, number>;
+    抢劫策略: Schema<{
+        名称: string;
+        描述: string;
+        成功率: number;
+        抢夺比例: number;
+        惩罚比例: number;
+    }[], {
+        名称: string;
+        描述: string;
+        成功率: number;
+        抢夺比例: number;
+        惩罚比例: number;
+    }[]>;
     决斗成功率: Schema<number, number>;
     存款利率: Schema<number, number>;
     利息最大时间: Schema<number, number>;
@@ -98,12 +112,24 @@ export declare const Config: Schema<Schemastery.ObjectS<{
         等级加成: Schema<number, number>;
         培训费用比例: Schema<number, number>;
         培训冷却: Schema<number, number>;
+    }>>;
+    注册激励: Schema<Schemastery.ObjectS<{
+        启用: Schema<boolean, boolean>;
+        开始时间: Schema<string, string>;
+        结束时间: Schema<string, string>;
+        奖励金额: Schema<number, number>;
+    }>, Schemastery.ObjectT<{
+        启用: Schema<boolean, boolean>;
+        开始时间: Schema<string, string>;
+        结束时间: Schema<string, string>;
+        奖励金额: Schema<number, number>;
     }>>;
 }>, Schemastery.ObjectT<{
     初始余额: Schema<number, number>;
     初始身价: Schema<number, number>;
     初始存款上限: Schema<number, number>;
     初始信用等级: Schema<number, number>;
+    自动注册: Schema<boolean, boolean>;
     赎身倍率: Schema<number, number>;
     中介费: Schema<number, number>;
     赎身提升: Schema<number, number>;
@@ -115,6 +141,19 @@ export declare const Config: Schema<Schemastery.ObjectS<{
     转账冷却: Schema<number, number>;
     种地冷却: Schema<number, number>;
     抢劫成功率: Schema<number, number>;
+    抢劫策略: Schema<{
+        名称: string;
+        描述: string;
+        成功率: number;
+        抢夺比例: number;
+        惩罚比例: number;
+    }[], {
+        名称: string;
+        描述: string;
+        成功率: number;
+        抢夺比例: number;
+        惩罚比例: number;
+    }[]>;
     决斗成功率: Schema<number, number>;
     存款利率: Schema<number, number>;
     利息最大时间: Schema<number, number>;
@@ -173,6 +212,17 @@ export declare const Config: Schema<Schemastery.ObjectS<{
         等级加成: Schema<number, number>;
         培训费用比例: Schema<number, number>;
         培训冷却: Schema<number, number>;
+    }>>;
+    注册激励: Schema<Schemastery.ObjectS<{
+        启用: Schema<boolean, boolean>;
+        开始时间: Schema<string, string>;
+        结束时间: Schema<string, string>;
+        奖励金额: Schema<number, number>;
+    }>, Schemastery.ObjectT<{
+        启用: Schema<boolean, boolean>;
+        开始时间: Schema<string, string>;
+        结束时间: Schema<string, string>;
+        奖励金额: Schema<number, number>;
     }>>;
 }>>;
 export declare const inject: {
@@ -180,3 +230,17 @@ export declare const inject: {
     weather: typeof WeatherService;
 };
 export declare function apply(ctx: Context, config: Config): Promise<void>;
+    messageRecall: Schema<Schemastery.ObjectS<{
+        enabled: Schema<boolean, boolean>;
+        delay: Schema<number, number>;
+    }>, Schemastery.ObjectT<{
+        enabled: Schema<boolean, boolean>;
+        delay: Schema<number, number>;
+    }>>;
+    messageRecall: Schema<Schemastery.ObjectS<{
+        enabled: Schema<boolean, boolean>;
+        delay: Schema<number, number>;
+    }>, Schemastery.ObjectT<{
+        enabled: Schema<boolean, boolean>;
+        delay: Schema<number, number>;
+    }>>;

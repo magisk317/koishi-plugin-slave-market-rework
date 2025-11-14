@@ -1,7 +1,8 @@
 export interface UserData {
     userId: string;
+    plainUserId: string;
+    scopeId: string;
     nickname: string;
-    gender: string;
     balance: number;
     deposit: number;
     creditLevel: number;
@@ -53,6 +54,14 @@ export interface UserData {
     isInPrison: boolean;
     prisonEndTime: number;
     lastAppearanceSwitchTime: number;
+    registerTime: number;
+    registerChannelId: string;
+    registerGuildId: string;
+    lastChannelId: string;
+    lastGuildId: string;
+    lastActiveTime: number;
+    autoRegistered: boolean;
+    registrationBonus: number;
 }
 export interface Item {
     id: string;
