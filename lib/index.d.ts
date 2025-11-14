@@ -1,6 +1,6 @@
 import { Context, Schema } from 'koishi';
 import { Config as PlayerMarketConfig } from './config/player_market';
-import { UserData, GameStatistics, VipCard } from './models/player_market';
+import { UserData, GameStatistics, VipCard, RedPacket } from './models/player_market';
 import { WeatherService } from './services/weather_service';
 import { WeatherConfig } from './config/weather';
 import { BackupService } from './services/backup_service';
@@ -22,6 +22,7 @@ declare module 'koishi' {
             isFinancialCrisis: boolean;
         };
         vip_cards: VipCard;
+        player_market_red_packets: RedPacket;
     }
 }
 export declare const Config: Schema<Schemastery.ObjectS<{

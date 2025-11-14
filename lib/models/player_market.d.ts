@@ -104,8 +104,36 @@ export interface BodyguardMarket {
 }
 export interface VipCard {
     id: string;
+    type: string;
+    durationHours: number;
+    durationLabel: string;
     isUsed: boolean;
     usedBy: string;
     usedTime: number;
     expireTime: number;
+    createdBy: string;
+    createdAt: number;
+}
+export interface RedPacketClaim {
+    userId: string;
+    nickname: string;
+    amount: number;
+    time: number;
+}
+export interface RedPacket {
+    id: string;
+    scopeId: string;
+    channelId: string;
+    guildId: string;
+    senderId: string;
+    senderNickname: string;
+    totalAmount: number;
+    remainingAmount: number;
+    totalShares: number;
+    remainingShares: number;
+    fee: number;
+    createdAt: number;
+    expiresAt: number;
+    claims: RedPacketClaim[];
+    isAdminPacket: boolean;
 }
