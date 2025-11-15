@@ -6,10 +6,13 @@ export interface UserData {
     balance: number;
     deposit: number;
     creditLevel: number;
+    loanCreditLevel: number;
     depositLimit: number;
     interest: number;
     lastInterestTime: number;
     price: number;
+    loanBalance: number;
+    lastLoanInterestTime: number;
     employer: string;
     lastWorkTime: number;
     lastRobTime: number;

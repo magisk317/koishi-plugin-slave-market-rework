@@ -114,6 +114,15 @@ export declare const Config: Schema<Schemastery.ObjectS<{
         培训费用比例: Schema<number, number>;
         培训冷却: Schema<number, number>;
     }>>;
+    贷款系统: Schema<Schemastery.ObjectS<{
+        基础额度: Schema<number, number>;
+        等级加成: Schema<number, number>;
+        利率: Schema<number, number>;
+    }>, Schemastery.ObjectT<{
+        基础额度: Schema<number, number>;
+        等级加成: Schema<number, number>;
+        利率: Schema<number, number>;
+    }>>;
     注册激励: Schema<Schemastery.ObjectS<{
         启用: Schema<boolean, boolean>;
         开始时间: Schema<string, string>;

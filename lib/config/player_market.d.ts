@@ -61,6 +61,11 @@ export interface Config {
         培训费用比例: number;
         培训冷却: number;
     };
+    贷款系统: {
+        基础额度: number;
+        等级加成: number;
+        利率: number;
+    };
     调试日志: boolean;
     注册激励: {
         启用: boolean;
@@ -164,6 +169,15 @@ export declare const Config: Schema<Schemastery.ObjectS<{
         等级加成: Schema<number, number>;
         培训费用比例: Schema<number, number>;
         培训冷却: Schema<number, number>;
+    }>>;
+    贷款系统: Schema<Schemastery.ObjectS<{
+        基础额度: Schema<number, number>;
+        等级加成: Schema<number, number>;
+        利率: Schema<number, number>;
+    }>, Schemastery.ObjectT<{
+        基础额度: Schema<number, number>;
+        等级加成: Schema<number, number>;
+        利率: Schema<number, number>;
     }>>;
     调试日志: Schema<boolean, boolean>;
     注册激励: Schema<Schemastery.ObjectS<{
