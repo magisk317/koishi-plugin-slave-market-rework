@@ -65,6 +65,7 @@ export interface Config {
         基础额度: number;
         等级加成: number;
         利率: number;
+        手续费: number;
     };
     调试日志: boolean;
     注册激励: {
@@ -174,10 +175,12 @@ export declare const Config: Schema<Schemastery.ObjectS<{
         基础额度: Schema<number, number>;
         等级加成: Schema<number, number>;
         利率: Schema<number, number>;
+        手续费: Schema<number, number>;
     }>, Schemastery.ObjectT<{
         基础额度: Schema<number, number>;
         等级加成: Schema<number, number>;
         利率: Schema<number, number>;
+        手续费: Schema<number, number>;
     }>>;
     调试日志: Schema<boolean, boolean>;
     注册激励: Schema<Schemastery.ObjectS<{
