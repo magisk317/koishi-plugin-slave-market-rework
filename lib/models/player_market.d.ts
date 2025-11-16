@@ -54,6 +54,8 @@ export interface UserData {
     jailReason: string;
     jailWorkIncome: number;
     jailWorkCount: number;
+    lastJailWorkTime: number;
+    lastJailVictimId: string;
     isInPrison: boolean;
     prisonEndTime: number;
     lastAppearanceSwitchTime: number;
