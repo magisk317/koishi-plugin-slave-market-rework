@@ -65,6 +65,8 @@ export interface UserData {
     lastActiveTime: number;
     autoRegistered: boolean;
     registrationBonus: number;
+    forceTradeStreak: number;
+    forceTradeExpiresAt: number;
 }
 export interface Item {
     id: string;
