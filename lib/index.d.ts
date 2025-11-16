@@ -1,6 +1,6 @@
 import { Context, Schema } from 'koishi';
 import { Config as PlayerMarketConfig } from './config/player_market';
-import { UserData, GameStatistics, VipCard, RedPacket } from './models/player_market';
+import { UserData, GameStatistics, VipCard, RedPacket, Transaction } from './models/player_market';
 import { WeatherService } from './services/weather_service';
 import { WeatherConfig } from './config/weather';
 import { BackupService } from './services/backup_service';
@@ -23,6 +23,7 @@ declare module 'koishi' {
         };
         vip_cards: VipCard;
         player_market_red_packets: RedPacket;
+        player_market_transactions: Transaction;
     }
 }
 export declare const Config: Schema<Schemastery.ObjectS<{
@@ -49,6 +50,7 @@ export declare const Config: Schema<Schemastery.ObjectS<{
     抢劫冷却: Schema<number, number>;
     转账冷却: Schema<number, number>;
     种地冷却: Schema<number, number>;
+    天灾概率: Schema<number, number>;
     抢劫成功率: Schema<number, number>;
     抢劫策略: Schema<Schemastery.ObjectS<{
         名称: Schema<string, string>;
@@ -178,6 +180,7 @@ export declare const Config: Schema<Schemastery.ObjectS<{
     抢劫冷却: Schema<number, number>;
     转账冷却: Schema<number, number>;
     种地冷却: Schema<number, number>;
+    天灾概率: Schema<number, number>;
     抢劫成功率: Schema<number, number>;
     抢劫策略: Schema<{
         名称: string;

@@ -144,3 +144,17 @@ export interface RedPacket {
     claims: RedPacketClaim[];
     isAdminPacket: boolean;
 }
+export interface Transaction {
+    id?: number;
+    userId: string;
+    scopeId: string;
+    direction: 'income' | 'expense';
+    category: string;
+    amount: number;
+    balanceAfter: number;
+    description: string;
+    relatedUserId: string;
+    metadata: Record<string, any>;
+    isFee: boolean;
+    createdAt: number;
+}
