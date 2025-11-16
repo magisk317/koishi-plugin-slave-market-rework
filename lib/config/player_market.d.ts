@@ -67,6 +67,7 @@ export interface Config {
         最高打工收入: number;
         手续费比例: number;
         手续费下限: number;
+        打工冷却: number;
     };
     管理员列表: string[];
     牛马福利: {
@@ -187,6 +188,7 @@ export declare const Config: Schema<Schemastery.ObjectS<{
         最高打工收入: Schema<number, number>;
         手续费比例: Schema<number, number>;
         手续费下限: Schema<number, number>;
+        打工冷却: Schema<number, number>;
     }>, Schemastery.ObjectT<{
         监狱打工收入: Schema<number, number>;
         监狱打工间隔: Schema<number, number>;
@@ -196,6 +198,7 @@ export declare const Config: Schema<Schemastery.ObjectS<{
         最高打工收入: Schema<number, number>;
         手续费比例: Schema<number, number>;
         手续费下限: Schema<number, number>;
+        打工冷却: Schema<number, number>;
     }>>;
     管理员列表: Schema<string[], string[]>;
     牛马福利: Schema<Schemastery.ObjectS<{
