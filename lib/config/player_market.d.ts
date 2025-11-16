@@ -10,7 +10,12 @@ export interface Config {
     中介费: number;
     赎身提升: number;
     打工基础收入: number;
+    打工收入范围: {
+        最低: number;
+        最高: number;
+    };
     牛马主加成: number;
+    打工税率: number;
     购买冷却: number;
     打工冷却: number;
     抢劫冷却: number;
@@ -23,12 +28,17 @@ export interface Config {
         成功率: number;
         抢夺比例: number;
         惩罚比例: number;
-    }[];
+    };
     决斗成功率: number;
     存款利率: number;
     利息最大时间: number;
     信用升级费用: number;
     转账手续费: number;
+    购买税率: number;
+    金融手续费: {
+        比例: number;
+        最低: number;
+    };
     决斗提升: number;
     决斗降低: number;
     保镖价格: number[];
@@ -53,6 +63,10 @@ export interface Config {
         监狱打工间隔: number;
         监狱打工次数上限: number;
         工作收入倍率: number;
+        最低打工收入: number;
+        最高打工收入: number;
+        手续费比例: number;
+        手续费下限: number;
     };
     管理员列表: string[];
     牛马福利: {
@@ -85,31 +99,47 @@ export declare const Config: Schema<Schemastery.ObjectS<{
     中介费: Schema<number, number>;
     赎身提升: Schema<number, number>;
     打工基础收入: Schema<number, number>;
+    打工收入范围: Schema<Schemastery.ObjectS<{
+        最低: Schema<number, number>;
+        最高: Schema<number, number>;
+    }>, Schemastery.ObjectT<{
+        最低: Schema<number, number>;
+        最高: Schema<number, number>;
+    }>>;
     牛马主加成: Schema<number, number>;
+    打工税率: Schema<number, number>;
     购买冷却: Schema<number, number>;
     打工冷却: Schema<number, number>;
     抢劫冷却: Schema<number, number>;
     转账冷却: Schema<number, number>;
     种地冷却: Schema<number, number>;
     抢劫成功率: Schema<number, number>;
-    抢劫策略: Schema<{
-        名称: string;
-        描述: string;
-        成功率: number;
-        抢夺比例: number;
-        惩罚比例: number;
-    }[], {
-        名称: string;
-        描述: string;
-        成功率: number;
-        抢夺比例: number;
-        惩罚比例: number;
-    }[]>;
+    抢劫策略: Schema<Schemastery.ObjectS<{
+        名称: Schema<string, string>;
+        描述: Schema<string, string>;
+        成功率: Schema<number, number>;
+        抢夺比例: Schema<number, number>;
+        惩罚比例: Schema<number, number>;
+    }>, Schemastery.ObjectT<{
+        名称: Schema<string, string>;
+        描述: Schema<string, string>;
+        成功率: Schema<number, number>;
+        抢夺比例: Schema<number, number>;
+        惩罚比例: Schema<number, number>;
+    }>>;
     决斗成功率: Schema<number, number>;
     存款利率: Schema<number, number>;
     利息最大时间: Schema<number, number>;
     信用升级费用: Schema<number, number>;
     转账手续费: Schema<number, number>;
+    购买税率: Schema<number, number>;
+    金融手续费: Schema<Schemastery.ObjectS<{
+        比例: Schema<number, number>;
+        最低: Schema<number, number>;
+    }>, Schemastery.ObjectT<{
+        比例: Schema<number, number>;
+        最低: Schema<number, number>;
+    }>>;
     决斗提升: Schema<number, number>;
     决斗降低: Schema<number, number>;
     保镖价格: Schema<number[], number[]>;
@@ -153,11 +183,19 @@ export declare const Config: Schema<Schemastery.ObjectS<{
         监狱打工间隔: Schema<number, number>;
         监狱打工次数上限: Schema<number, number>;
         工作收入倍率: Schema<number, number>;
+        最低打工收入: Schema<number, number>;
+        最高打工收入: Schema<number, number>;
+        手续费比例: Schema<number, number>;
+        手续费下限: Schema<number, number>;
     }>, Schemastery.ObjectT<{
         监狱打工收入: Schema<number, number>;
         监狱打工间隔: Schema<number, number>;
         监狱打工次数上限: Schema<number, number>;
         工作收入倍率: Schema<number, number>;
+        最低打工收入: Schema<number, number>;
+        最高打工收入: Schema<number, number>;
+        手续费比例: Schema<number, number>;
+        手续费下限: Schema<number, number>;
     }>>;
     管理员列表: Schema<string[], string[]>;
     牛马福利: Schema<Schemastery.ObjectS<{
