@@ -158,6 +158,18 @@ export interface Transaction {
     isFee: boolean;
     createdAt: number;
 }
+export interface TaxPoolRecord {
+    id?: number;
+    scopeId: string;
+    platform: string;
+    channelId: string;
+    guildId: string;
+    amount: number;
+    dateKey: number;
+    distributed: boolean;
+    createdAt: number;
+    updatedAt: number;
+}
 export interface ResetLog {
     userId: string;
     scopeId: string;

@@ -1,6 +1,6 @@
 import { Context, Schema } from 'koishi';
 import { Config as PlayerMarketConfig } from './config/player_market';
-import { UserData, GameStatistics, VipCard, RedPacket, Transaction, ResetLog } from './models/player_market';
+import { UserData, GameStatistics, VipCard, RedPacket, Transaction, ResetLog, TaxPoolRecord } from './models/player_market';
 import { WeatherService } from './services/weather_service';
 import { WeatherConfig } from './config/weather';
 import { BackupService } from './services/backup_service';
@@ -12,6 +12,15 @@ declare module 'koishi' {
     interface Context {
         weatherService: WeatherService;
         backupService: BackupService;
+        taxService: {
+            recordTax(target: import('koishi').Session | {
+                scopeId?: string;
+                channelId?: string;
+                guildId?: string;
+                platform?: string;
+            }, amount: number): Promise<void>;
+            start(): void;
+        };
     }
     interface Tables {
         player_market_users: UserData;
@@ -26,6 +35,7 @@ declare module 'koishi' {
         vip_cards: VipCard;
         player_market_red_packets: RedPacket;
         player_market_transactions: Transaction;
+        player_market_tax_pool: TaxPoolRecord;
     }
 }
 export declare const Config: Schema<Schemastery.ObjectS<{
