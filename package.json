@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-slave-market-enhanced",
   "description": "大牛马时代 🐂🐎（增强版）",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
