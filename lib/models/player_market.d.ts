@@ -158,3 +158,9 @@ export interface Transaction {
     isFee: boolean;
     createdAt: number;
 }
+export interface ResetLog {
+    userId: string;
+    scopeId: string;
+    plainUserId: string;
+    lastResetTime: number;
+}
