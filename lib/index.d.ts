@@ -19,6 +19,11 @@ declare module 'koishi' {
                 guildId?: string;
                 platform?: string;
             }, amount: number): Promise<void>;
+            getPoolStatus(scopeId: string): Promise<{
+                scopeId: string;
+                amount: number;
+                updatedAt: number;
+            }>;
             start(): void;
         };
     }
