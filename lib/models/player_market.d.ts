@@ -8,6 +8,8 @@ export interface UserData {
     creditLevel: number;
     loanCreditLevel: number;
     depositLimit: number;
+    depositPenaltyLevel: number;
+    depositOverdraftPenaltyLevel: number;
     interest: number;
     lastInterestTime: number;
     price: number;
