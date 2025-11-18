@@ -177,4 +177,6 @@ export interface ResetLog {
     scopeId: string;
     plainUserId: string;
     lastResetTime: number;
+    resetCount: number;
+    isBanned: boolean;
 }
