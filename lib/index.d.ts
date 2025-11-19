@@ -1,6 +1,6 @@
 import { Context, Schema } from 'koishi';
 import { Config as PlayerMarketConfig } from './config/player_market';
-import { UserData, GameStatistics, VipCard, RedPacket, Transaction, ResetLog, TaxPoolRecord } from './models/player_market';
+import { UserData, GameStatistics, VipCard, RedPacket, Transaction, TaxPoolRecord } from './models/player_market';
 import { WeatherService } from './services/weather_service';
 import { WeatherConfig } from './config/weather';
 import { BackupService } from './services/backup_service';
@@ -36,7 +36,6 @@ declare module 'koishi' {
             isFinancialCrisis: boolean;
             isDisabled: boolean;
         };
-        player_market_reset_logs: ResetLog;
         vip_cards: VipCard;
         player_market_red_packets: RedPacket;
         player_market_transactions: Transaction;

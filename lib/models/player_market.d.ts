@@ -172,11 +172,3 @@ export interface TaxPoolRecord {
     createdAt: number;
     updatedAt: number;
 }
-export interface ResetLog {
-    userId: string;
-    scopeId: string;
-    plainUserId: string;
-    lastResetTime: number;
-    resetCount: number;
-    isBanned: boolean;
-}
