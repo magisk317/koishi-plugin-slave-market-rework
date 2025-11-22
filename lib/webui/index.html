@@ -1,336 +1,524 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slave Market Dashboard</title>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        gray: {
-                            900: '#1a1b1e',
-                            800: '#25262b',
-                            700: '#2c2e33',
-                            600: '#373a40',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <title>大牛马时代 - 管理面板</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
     <style>
-        body {
-            background-color: #1a1b1e;
-            color: #c1c2c5;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .card {
-            background-color: #25262b;
-            border: 1px solid #373a40;
-            border-radius: 0.5rem;
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        #app {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 16px;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 16px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .refresh-btn:active {
+            transform: translateY(0);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .stat-icon {
+            font-size: 24px;
+            margin-right: 8px;
+        }
+
+        .users-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f7fafc;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 14px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #2d3748;
+        }
+
+        tr:hover {
+            background: #f7fafc;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-money {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-money:hover {
+            background: #38a169;
+        }
+
+        .btn-vip {
+            background: #ed8936;
+            color: white;
+        }
+
+        .btn-vip:hover {
+            background: #dd6b20;
+        }
+
+        .btn-jail {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-jail:hover {
+            background: #e53e3e;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .page-btn {
+            padding: 8px 16px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-vip {
+            background: #fef5e7;
+            color: #d68910;
+        }
+
+        .badge-jailed {
+            background: #fadbd8;
+            color: #c0392b;
         }
     </style>
 </head>
-<body class="min-h-screen p-6">
-    <div id="app" class="max-w-7xl mx-auto">
-        <!-- Header -->
-        <header class="mb-8 flex justify-between items-center">
-            <div>
-                <h1 class="text-3xl font-bold text-white mb-2">Slave Market Dashboard</h1>
-                <p class="text-gray-400">Manage your slave market economy and users</p>
-            </div>
-            <div class="flex gap-4">
-                <button @click="refreshData" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition">
-                    Refresh Data
-                </button>
-            </div>
-        </header>
 
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="card p-6">
-                <div class="text-gray-400 mb-2">Total Users</div>
-                <div class="text-3xl font-bold text-white">{{ stats.totalUsers }}</div>
+<body>
+    <div id="app">
+        <div class="header">
+            <h1>🐂🐎 大牛马时代 - 管理面板</h1>
+            <p>管理您的牛马经济和用户</p>
+            <button class="refresh-btn" @click="loadData">🔄 刷新数据</button>
+        </div>
+
+        <div v-if="error" class="error">{{ error }}</div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">👥 总用户数</div>
+                <div class="stat-value">{{ stats.totalUsers }}</div>
             </div>
-            <div class="card p-6">
-                <div class="text-gray-400 mb-2">VIP Users</div>
-                <div class="text-3xl font-bold text-yellow-500">{{ stats.vipUsers }}</div>
+            <div class="stat-card">
+                <div class="stat-label">👑 VIP 用户</div>
+                <div class="stat-value">{{ stats.vipUsers }}</div>
             </div>
-            <div class="card p-6">
-                <div class="text-gray-400 mb-2">Jailed Users</div>
-                <div class="text-3xl font-bold text-red-500">{{ stats.jailedUsers }}</div>
+            <div class="stat-card">
+                <div class="stat-label">🚔 监禁用户</div>
+                <div class="stat-value">{{ stats.jailedUsers }}</div>
             </div>
-            <div class="card p-6">
-                <div class="text-gray-400 mb-2">Total Economy</div>
-                <div class="text-3xl font-bold text-green-500">💰 {{ formatMoney(stats.totalMoney) }}</div>
+            <div class="stat-card">
+                <div class="stat-label">💰 总经济量</div>
+                <div class="stat-value">{{ formatMoney(stats.totalMoney) }}</div>
             </div>
         </div>
 
-        <!-- User Management -->
-        <div class="card overflow-hidden">
-            <div class="p-6 border-b border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <h2 class="text-xl font-bold text-white">User Management</h2>
-                <div class="flex gap-4 w-full sm:w-auto">
-                    <input 
-                        v-model="searchQuery" 
-                        @input="debounceSearch"
-                        type="text" 
-                        placeholder="Search nickname or ID..." 
-                        class="bg-gray-900 border border-gray-700 text-white px-4 py-2 rounded w-full sm:w-64 focus:outline-none focus:border-blue-500"
-                    >
-                </div>
-            </div>
-            
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
+        <div class="users-section">
+            <h2 class="section-title">用户管理</h2>
+            <input type="text" class="search-box" v-model="searchQuery" @input="searchUsers"
+                placeholder="🔍 搜索用户昵称或 ID...">
+
+            <div v-if="loading" class="loading">加载中...</div>
+
+            <div v-else class="table-container">
+                <table>
                     <thead>
-                        <tr class="bg-gray-800 text-gray-400 border-b border-gray-700">
-                            <th class="p-4">User Info</th>
-                            <th class="p-4">Balance</th>
-                            <th class="p-4">Status</th>
-                            <th class="p-4">Last Active</th>
-                            <th class="p-4 text-right">Actions</th>
+                        <tr>
+                            <th>用户 ID</th>
+                            <th>昵称</th>
+                            <th>余额</th>
+                            <th>状态</th>
+                            <th>最后活跃</th>
+                            <th>操作</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="user in users" :key="user.userId" class="border-b border-gray-700 hover:bg-gray-700/50 transition">
-                            <td class="p-4">
-                                <div class="font-medium text-white">{{ user.nickname }}</div>
-                                <div class="text-sm text-gray-500">{{ user.userId }}</div>
+                        <tr v-for="user in users" :key="user.userId">
+                            <td>{{ user.userId }}</td>
+                            <td>{{ user.nickname || '未知' }}</td>
+                            <td>{{ formatMoney(user.balance || 0) }}</td>
+                            <td>
+                                <span v-if="isVip(user)" class="badge badge-vip">VIP</span>
+                                <span v-if="isJailed(user)" class="badge badge-jailed">监禁中</span>
                             </td>
-                            <td class="p-4 font-mono text-green-400">{{ formatMoney(user.balance) }}</td>
-                            <td class="p-4">
-                                <div class="flex gap-2">
-                                    <span v-if="isVip(user)" class="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-xs">VIP</span>
-                                    <span v-if="isJailed(user)" class="px-2 py-1 bg-red-500/20 text-red-400 rounded text-xs">JAILED</span>
-                                    <span v-if="!isVip(user) && !isJailed(user)" class="px-2 py-1 bg-gray-600/20 text-gray-400 rounded text-xs">NORMAL</span>
-                                </div>
-                            </td>
-                            <td class="p-4 text-gray-400">{{ formatDate(user.lastActiveTime) }}</td>
-                            <td class="p-4 text-right">
-                                <div class="flex justify-end gap-2">
-                                    <button @click="openMoneyModal(user)" class="p-2 hover:bg-green-500/20 text-green-400 rounded" title="Add Money">
-                                        💰
-                                    </button>
-                                    <button @click="toggleVip(user)" class="p-2 hover:bg-yellow-500/20 text-yellow-400 rounded" :title="isVip(user) ? 'Revoke VIP' : 'Grant VIP'">
-                                        👑
-                                    </button>
-                                    <button @click="toggleJail(user)" class="p-2 hover:bg-red-500/20 text-red-400 rounded" :title="isJailed(user) ? 'Release' : 'Jail'">
-                                        🚔
-                                    </button>
-                                </div>
+                            <td>{{ formatTime(user.lastActiveTime) }}</td>
+                            <td>
+                                <button class="action-btn btn-money" @click="manageMoney(user)">💰 金币</button>
+                                <button class="action-btn btn-vip" @click="manageVip(user)">👑 VIP</button>
+                                <button class="action-btn btn-jail" @click="manageJail(user)">🚔 监禁</button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- Pagination -->
-            <div class="p-4 border-t border-gray-700 flex justify-between items-center">
-                <div class="text-gray-400">
-                    Showing {{ (page - 1) * pageSize + 1 }} to {{ Math.min(page * pageSize, total) }} of {{ total }} users
-                </div>
-                <div class="flex gap-2">
-                    <button 
-                        @click="changePage(page - 1)" 
-                        :disabled="page === 1"
-                        class="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        Previous
-                    </button>
-                    <button 
-                        @click="changePage(page + 1)" 
-                        :disabled="page * pageSize >= total"
-                        class="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        Next
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Money Modal -->
-        <div v-if="showMoneyModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div class="card p-6 w-full max-w-md">
-                <h3 class="text-xl font-bold text-white mb-4">Manage Balance for {{ selectedUser?.nickname }}</h3>
-                <div class="mb-4">
-                    <label class="block text-gray-400 mb-2">Current Balance: {{ formatMoney(selectedUser?.balance) }}</label>
-                    <input v-model.number="moneyAmount" type="number" class="bg-gray-900 border border-gray-700 text-white px-4 py-2 rounded w-full focus:outline-none focus:border-blue-500" placeholder="Amount">
-                </div>
-                <div class="flex justify-end gap-3">
-                    <button @click="showMoneyModal = false" class="px-4 py-2 text-gray-400 hover:text-white">Cancel</button>
-                    <button @click="updateMoney('set')" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded">Set</button>
-                    <button @click="updateMoney('add')" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded">Add</button>
-                </div>
+            <div class="pagination">
+                <button class="page-btn" @click="prevPage" :disabled="currentPage === 1">上一页</button>
+                <span>第 {{ currentPage }} 页 / 共 {{ totalPages }} 页</span>
+                <button class="page-btn" @click="nextPage" :disabled="currentPage >= totalPages">下一页</button>
             </div>
         </div>
     </div>
 
     <script>
-        const { createApp, ref, onMounted, watch } = Vue;
+        const { createApp } = Vue;
 
         createApp({
-            setup() {
-                const stats = ref({
-                    totalUsers: 0,
-                    vipUsers: 0,
-                    jailedUsers: 0,
-                    totalMoney: 0
-                });
-                const users = ref([]);
-                const total = ref(0);
-                const page = ref(1);
-                const pageSize = ref(20);
-                const searchQuery = ref('');
-                const showMoneyModal = ref(false);
-                const selectedUser = ref(null);
-                const moneyAmount = ref(0);
-
-                const fetchStats = async () => {
-                    try {
-                        const res = await fetch('/slave-market/api/stats');
-                        const data = await res.json();
-                        if (data.success) {
-                            stats.value = data.data;
-                        }
-                    } catch (e) {
-                        console.error(e);
-                    }
+            data() {
+                return {
+                    stats: {
+                        totalUsers: 0,
+                        vipUsers: 0,
+                        jailedUsers: 0,
+                        totalMoney: 0
+                    },
+                    users: [],
+                    loading: false,
+                    error: null,
+                    searchQuery: '',
+                    currentPage: 1,
+                    pageSize: 20,
+                    totalPages: 1,
+                    searchTimeout: null
                 };
-
-                const fetchUsers = async () => {
+            },
+            mounted() {
+                this.loadData();
+            },
+            methods: {
+                async loadData() {
+                    await this.loadStats();
+                    await this.loadUsers();
+                },
+                async loadStats() {
+                    try {
+                        const response = await fetch('/slave-market/api/stats');
+                        const data = await response.json();
+                        if (data.success) {
+                            this.stats = data.data;
+                        } else {
+                            this.error = '加载统计数据失败: ' + data.message;
+                        }
+                    } catch (err) {
+                        this.error = '加载统计数据失败: ' + err.message;
+                        console.error(err);
+                    }
+                },
+                async loadUsers() {
+                    this.loading = true;
+                    this.error = null;
                     try {
                         const params = new URLSearchParams({
-                            page: page.value,
-                            pageSize: pageSize.value,
-                            search: searchQuery.value
+                            page: this.currentPage,
+                            pageSize: this.pageSize,
+                            search: this.searchQuery
                         });
-                        const res = await fetch(`/slave-market/api/users?${params}`);
-                        const data = await res.json();
+                        const response = await fetch('/slave-market/api/users?' + params);
+                        const data = await response.json();
                         if (data.success) {
-                            users.value = data.data;
-                            total.value = data.total;
+                            this.users = data.data;
+                            this.totalPages = Math.ceil(data.total / this.pageSize);
+                        } else {
+                            this.error = '加载用户数据失败: ' + data.message;
                         }
-                    } catch (e) {
-                        console.error(e);
+                    } catch (err) {
+                        this.error = '加载用户数据失败: ' + err.message;
+                        console.error(err);
+                    } finally {
+                        this.loading = false;
                     }
-                };
-
-                const refreshData = () => {
-                    fetchStats();
-                    fetchUsers();
-                };
-
-                const debounceSearch = (() => {
-                    let timer;
-                    return () => {
-                        clearTimeout(timer);
-                        timer = setTimeout(() => {
-                            page.value = 1;
-                            fetchUsers();
-                        }, 300);
-                    };
-                })();
-
-                const changePage = (newPage) => {
-                    page.value = newPage;
-                    fetchUsers();
-                };
-
-                const isVip = (user) => user.vipEndTime > Date.now();
-                const isJailed = (user) => user.jailEndTime > Date.now();
-
-                const formatMoney = (val) => val?.toLocaleString() || '0';
-                const formatDate = (ts) => ts ? new Date(ts).toLocaleString() : 'Never';
-
-                const toggleVip = async (user) => {
-                    const isCurrentlyVip = isVip(user);
-                    const duration = isCurrentlyVip ? 0 : 30 * 24 * 60 * 60 * 1000; // Default 30 days
-                    if (!confirm(`Are you sure you want to ${isCurrentlyVip ? 'revoke' : 'grant'} VIP for ${user.nickname}?`)) return;
-
+                },
+                searchUsers() {
+                    clearTimeout(this.searchTimeout);
+                    this.searchTimeout = setTimeout(() => {
+                        this.currentPage = 1;
+                        this.loadUsers();
+                    }, 500);
+                },
+                prevPage() {
+                    if (this.currentPage > 1) {
+                        this.currentPage--;
+                        this.loadUsers();
+                    }
+                },
+                nextPage() {
+                    if (this.currentPage < this.totalPages) {
+                        this.currentPage++;
+                        this.loadUsers();
+                    }
+                },
+                isVip(user) {
+                    return user.vipEndTime && user.vipEndTime > Date.now();
+                },
+                isJailed(user) {
+                    return user.jailEndTime && user.jailEndTime > Date.now();
+                },
+                formatMoney(amount) {
+                    return amount.toLocaleString('zh-CN');
+                },
+                formatTime(timestamp) {
+                    if (!timestamp) return '从未';
+                    const date = new Date(timestamp);
+                    return date.toLocaleString('zh-CN');
+                },
+                manageMoney(user) {
+                    const amount = prompt(`为用户 ${user.nickname} 设置金币数量:`, user.balance);
+                    if (amount !== null) {
+                        this.updateMoney(user.userId, parseFloat(amount));
+                    }
+                },
+                manageVip(user) {
+                    const days = prompt(`为用户 ${user.nickname} 设置 VIP 天数 (0 = 取消):`, '30');
+                    if (days !== null) {
+                        const duration = parseFloat(days) * 24 * 60 * 60 * 1000;
+                        this.updateVip(user.userId, duration);
+                    }
+                },
+                manageJail(user) {
+                    const jailed = confirm(`${this.isJailed(user) ? '释放' : '监禁'} 用户 ${user.nickname}?`);
+                    if (jailed) {
+                        this.updateJail(user.userId, !this.isJailed(user));
+                    }
+                },
+                async updateMoney(userId, amount) {
                     try {
-                        const res = await fetch(`/slave-market/api/users/${user.userId}/vip`, {
+                        const response = await fetch(`/slave-market/api/users/${userId}/money`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ amount, mode: 'set' })
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            alert('✅ 金币更新成功');
+                            this.loadData();
+                        } else {
+                            alert('❌ 更新失败: ' + data.message);
+                        }
+                    } catch (err) {
+                        alert('❌ 更新失败: ' + err.message);
+                    }
+                },
+                async updateVip(userId, duration) {
+                    try {
+                        const response = await fetch(`/slave-market/api/users/${userId}/vip`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ duration })
                         });
-                        if (res.ok) refreshData();
-                    } catch (e) {
-                        alert('Failed to update VIP');
-                    }
-                };
-
-                const toggleJail = async (user) => {
-                    const isCurrentlyJailed = isJailed(user);
-                    if (!confirm(`Are you sure you want to ${isCurrentlyJailed ? 'release' : 'jail'} ${user.nickname}?`)) return;
-
-                    try {
-                        const res = await fetch(`/slave-market/api/users/${user.userId}/jail`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ jailed: !isCurrentlyJailed })
-                        });
-                        if (res.ok) refreshData();
-                    } catch (e) {
-                        alert('Failed to update Jail status');
-                    }
-                };
-
-                const openMoneyModal = (user) => {
-                    selectedUser.value = user;
-                    moneyAmount.value = 0;
-                    showMoneyModal.value = true;
-                };
-
-                const updateMoney = async (mode) => {
-                    if (!selectedUser.value) return;
-                    try {
-                        const res = await fetch(`/slave-market/api/users/${selectedUser.value.userId}/money`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ amount: moneyAmount.value, mode })
-                        });
-                        if (res.ok) {
-                            showMoneyModal.value = false;
-                            refreshData();
+                        const data = await response.json();
+                        if (data.success) {
+                            alert('✅ VIP 状态更新成功');
+                            this.loadData();
+                        } else {
+                            alert('❌ 更新失败: ' + data.message);
                         }
-                    } catch (e) {
-                        alert('Failed to update money');
+                    } catch (err) {
+                        alert('❌ 更新失败: ' + err.message);
                     }
-                };
-
-                onMounted(() => {
-                    refreshData();
-                });
-
-                return {
-                    stats,
-                    users,
-                    total,
-                    page,
-                    pageSize,
-                    searchQuery,
-                    showMoneyModal,
-                    selectedUser,
-                    moneyAmount,
-                    refreshData,
-                    debounceSearch,
-                    changePage,
-                    isVip,
-                    isJailed,
-                    formatMoney,
-                    formatDate,
-                    toggleVip,
-                    toggleJail,
-                    openMoneyModal,
-                    updateMoney
-                };
+                },
+                async updateJail(userId, jailed) {
+                    try {
+                        const response = await fetch(`/slave-market/api/users/${userId}/jail`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ jailed })
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            alert('✅ 监禁状态更新成功');
+                            this.loadData();
+                        } else {
+                            alert('❌ 更新失败: ' + data.message);
+                        }
+                    } catch (err) {
+                        alert('❌ 更新失败: ' + err.message);
+                    }
+                }
             }
         }).mount('#app');
     </script>
 </body>
+
 </html>
