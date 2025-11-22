@@ -749,9 +749,17 @@
                 <div v-if="!currentUser" class="content-card login-container">
                     <h2 class="card-title" style="margin-bottom: 20px;">登录个人中心</h2>
                     <div class="form-group">
-                        <label class="form-label">请输入你的用户 ID</label>
+                        <label class="form-label">用户 ID</label>
                         <input type="text" class="form-input" v-model="loginUserId" placeholder="例如: 123456"
                             @keyup.enter="login">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">登录令牌 (Token)</label>
+                        <input type="password" class="form-input" v-model="loginToken" placeholder="请输入令牌"
+                            @keyup.enter="login">
+                        <p style="font-size: 12px; color: #7f8c8d; margin-top: 4px;">
+                            提示: 请在群内发送指令 <code>webui</code> 获取登录令牌
+                        </p>
                     </div>
                     <button class="btn btn-primary" style="width: 100%; justify-content: center;" @click="login"
                         :disabled="loading">
@@ -882,6 +890,7 @@
                     selectedCrop: '',
                     // Personal Center
                     loginUserId: '',
+                    loginToken: '',
                     currentUser: null
                 };
             },
@@ -890,8 +899,11 @@
                 this.loadCrops();
                 // Check local storage for login
                 const savedUserId = localStorage.getItem('slave_market_user_id');
-                if (savedUserId) {
-                    this.fetchUser(savedUserId);
+                const savedToken = localStorage.getItem('slave_market_user_token');
+                if (savedUserId && savedToken) {
+                    this.loginUserId = savedUserId;
+                    this.loginToken = savedToken;
+                    this.fetchUser(savedUserId, savedToken);
                 }
             },
             watch: {
@@ -899,7 +911,7 @@
                     if (newView === 'users') {
                         this.loadUsers();
                     } else if (newView === 'personal' && this.currentUser) {
-                        this.fetchUser(this.currentUser.userId); // Refresh data
+                        this.fetchUser(this.currentUser.userId, this.loginToken); // Refresh data
                     }
                 }
             },
@@ -1032,19 +1044,26 @@
                 async confirmPlant() {
                     if (!this.selectedUser || !this.selectedCrop) return;
 
+                    // Check if it's self-planting (requires token)
+                    const isSelf = this.currentUser && this.currentUser.userId === this.selectedUser.userId;
+                    const body = { cropName: this.selectedCrop };
+                    if (isSelf) {
+                        body.token = this.loginToken;
+                    }
+
                     try {
                         const response = await fetch(`/slave-market/api/users/${this.selectedUser.userId}/plant`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ cropName: this.selectedCrop })
+                            body: JSON.stringify(body)
                         });
                         const data = await response.json();
                         if (data.success) {
                             alert('✅ ' + data.message);
                             this.closePlantModal();
                             this.loadUsers();
-                            if (this.currentUser && this.currentUser.userId === this.selectedUser.userId) {
-                                this.fetchUser(this.currentUser.userId);
+                            if (isSelf) {
+                                this.fetchUser(this.currentUser.userId, this.loginToken);
                             }
                         } else {
                             alert('❌ 种植失败: ' + data.message);
@@ -1109,27 +1128,34 @@
                 },
                 // Personal Center Methods
                 async login() {
-                    if (!this.loginUserId) return;
+                    if (!this.loginUserId || !this.loginToken) {
+                        alert('请输入用户 ID 和令牌');
+                        return;
+                    }
                     this.loading = true;
-                    await this.fetchUser(this.loginUserId);
+                    await this.fetchUser(this.loginUserId, this.loginToken);
                     this.loading = false;
                     if (this.currentUser) {
                         localStorage.setItem('slave_market_user_id', this.loginUserId);
+                        localStorage.setItem('slave_market_user_token', this.loginToken);
                     }
                 },
                 logout() {
                     this.currentUser = null;
                     this.loginUserId = '';
+                    this.loginToken = '';
                     localStorage.removeItem('slave_market_user_id');
+                    localStorage.removeItem('slave_market_user_token');
                 },
-                async fetchUser(userId) {
+                async fetchUser(userId, token) {
                     try {
-                        const response = await fetch(`/slave-market/api/users/${userId}`);
+                        const params = new URLSearchParams({ userId, token });
+                        const response = await fetch('/slave-market/api/profile?' + params);
                         const data = await response.json();
                         if (data.success) {
                             this.currentUser = data.data;
                         } else {
-                            alert('用户不存在');
+                            alert('登录失败: ' + data.message);
                             this.logout();
                         }
                     } catch (err) {
@@ -1141,12 +1167,14 @@
                     if (!this.currentUser) return;
                     try {
                         const response = await fetch(`/slave-market/api/users/${this.currentUser.userId}/harvest`, {
-                            method: 'POST'
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ token: this.loginToken })
                         });
                         const data = await response.json();
                         if (data.success) {
                             alert('✅ ' + data.message);
-                            this.fetchUser(this.currentUser.userId);
+                            this.fetchUser(this.currentUser.userId, this.loginToken);
                         } else {
                             alert('❌ 收获失败: ' + data.message);
                         }
