@@ -22,8 +22,8 @@
       "zh": "大牛马时代游戏插件（增强版）"
     },
     "service": {
-      "required": ["database", "router"],
-      "optional": ["puppeteer", "recall"]
+      "required": ["database"],
+      "optional": ["puppeteer", "recall", "server"]
     }
   },
   "peerDependencies": {
