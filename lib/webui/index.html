@@ -345,6 +345,15 @@
             background: #c0392b;
         }
 
+        .btn-plant {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-plant:hover {
+            background: #219150;
+        }
+
         /* Pagination */
         .pagination {
             display: flex;
@@ -407,6 +416,84 @@
             margin-bottom: 16px;
             opacity: 0.5;
         }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            cursor: pointer;
+            font-size: 20px;
+            color: #95a5a6;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #dfe6e9;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
     </style>
 </head>
 
@@ -419,11 +506,12 @@
                 <div class="sidebar-subtitle">管理面板</div>
             </div>
             <nav class="sidebar-nav">
-                <div class="nav-item active" @click="currentView = 'dashboard'">
+                <div class="nav-item" :class="{ active: currentView === 'dashboard' }"
+                    @click="currentView = 'dashboard'">
                     <i class="fas fa-chart-line"></i>
                     <span>数据统计</span>
                 </div>
-                <div class="nav-item" @click="currentView = 'users'">
+                <div class="nav-item" :class="{ active: currentView === 'users' }" @click="currentView = 'users'">
                     <i class="fas fa-users"></i>
                     <span>用户管理</span>
                 </div>
@@ -535,6 +623,10 @@
                                         <span v-if="isJailed(user)" class="badge badge-jailed">
                                             <i class="fas fa-lock"></i> 监禁中
                                         </span>
+                                        <span v-if="user.currentCrop" class="badge"
+                                            style="background: #e8f5e9; color: #2e7d32;">
+                                            <i class="fas fa-seedling"></i> {{ user.currentCrop }}
+                                        </span>
                                     </td>
                                     <td>{{ formatTime(user.lastActiveTime) }}</td>
                                     <td>
@@ -546,6 +638,9 @@
                                         </button>
                                         <button class="action-btn btn-jail" @click="manageJail(user)" title="管理监禁">
                                             <i class="fas fa-lock"></i>
+                                        </button>
+                                        <button class="action-btn btn-plant" @click="openPlantModal(user)" title="种地">
+                                            <i class="fas fa-seedling"></i>
                                         </button>
                                     </td>
                                 </tr>
@@ -565,6 +660,30 @@
                 </div>
             </div>
         </div>
+
+        <!-- Plant Modal -->
+        <div class="modal-overlay" v-if="showPlantModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">为用户 {{ selectedUser?.nickname }} 种地</div>
+                    <div class="modal-close" @click="closePlantModal">&times;</div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">选择作物</label>
+                        <select class="form-select" v-model="selectedCrop">
+                            <option v-for="crop in crops" :key="crop.name" :value="crop.name">
+                                {{ crop.emoji }} {{ crop.name }} (成本: {{ crop.price }}, 产值: {{ crop.harvestPrice }})
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @click="closePlantModal">取消</button>
+                    <button class="btn btn-primary" @click="confirmPlant">确定种植</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -581,17 +700,22 @@
                         totalMoney: 0
                     },
                     users: [],
+                    crops: [],
                     loading: false,
                     error: null,
                     searchQuery: '',
                     currentPage: 1,
                     pageSize: 20,
                     totalPages: 1,
-                    searchTimeout: null
+                    searchTimeout: null,
+                    showPlantModal: false,
+                    selectedUser: null,
+                    selectedCrop: ''
                 };
             },
             mounted() {
                 this.loadData();
+                this.loadCrops();
             },
             watch: {
                 currentView(newView) {
@@ -643,6 +767,20 @@
                         console.error(err);
                     } finally {
                         this.loading = false;
+                    }
+                },
+                async loadCrops() {
+                    try {
+                        const response = await fetch('/slave-market/api/crops');
+                        const data = await response.json();
+                        if (data.success) {
+                            this.crops = data.data;
+                            if (this.crops.length > 0) {
+                                this.selectedCrop = this.crops[0].name;
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Failed to load crops:', err);
                     }
                 },
                 searchUsers() {
@@ -702,6 +840,35 @@
                     const confirmed = confirm(`确定要${action}用户 ${user.nickname} 吗?`);
                     if (confirmed) {
                         this.updateJail(user.userId, !this.isJailed(user));
+                    }
+                },
+                openPlantModal(user) {
+                    this.selectedUser = user;
+                    this.showPlantModal = true;
+                },
+                closePlantModal() {
+                    this.showPlantModal = false;
+                    this.selectedUser = null;
+                },
+                async confirmPlant() {
+                    if (!this.selectedUser || !this.selectedCrop) return;
+
+                    try {
+                        const response = await fetch(`/slave-market/api/users/${this.selectedUser.userId}/plant`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ cropName: this.selectedCrop })
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            alert('✅ ' + data.message);
+                            this.closePlantModal();
+                            this.loadUsers();
+                        } else {
+                            alert('❌ 种植失败: ' + data.message);
+                        }
+                    } catch (err) {
+                        alert('❌ 种植失败: ' + err.message);
                     }
                 },
                 async updateMoney(userId, amount) {
