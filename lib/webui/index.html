@@ -653,25 +653,42 @@
             <div v-if="currentView === 'users'">
                 <div class="page-header">
                     <h1 class="page-title">用户管理</h1>
-                    <p class="page-subtitle">管理所有牛马用户的信息和状态</p>
+                    <p class="page-subtitle">管理所有注册用户</p>
                 </div>
 
-                <div v-if="error" class="error">{{ error }}</div>
+                <div v-if="!adminToken" class="content-card login-container">
+                    <h2 class="card-title" style="margin-bottom: 20px;">管理员登录</h2>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-lock"></i> 此页面需要管理员权限。
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">管理员令牌 (Admin Token)</label>
+                        <input type="password" class="form-input" v-model="inputAdminToken" placeholder="请输入令牌"
+                            @keyup.enter="loginAdmin">
+                        <p style="font-size: 12px; color: #7f8c8d; margin-top: 4px;">
+                            提示: 请在群内发送指令 <code>webui_admin</code> 获取管理员令牌
+                        </p>
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%; justify-content: center;" @click="loginAdmin">
+                        <i class="fas fa-sign-in-alt"></i> 验证
+                    </button>
+                </div>
 
-                <div class="content-card">
+                <div v-else class="content-card">
                     <div class="card-header">
                         <h2 class="card-title">用户列表</h2>
-                        <button class="btn btn-primary" @click="loadData">
-                            <i class="fas fa-sync-alt"></i>
-                            刷新数据
-                        </button>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" v-model="searchQuery" @input="searchUsers" placeholder="搜索用户...">
+                        </div>
                     </div>
 
-                    <input type="text" class="search-box" v-model="searchQuery" @input="searchUsers"
-                        placeholder="🔍 搜索用户昵称或 ID...">
-
-                    <div v-if="loading" class="loading">
+                    <div v-if="loading" class="loading-spinner">
                         <i class="fas fa-spinner fa-spin"></i> 加载中...
+                    </div>
+
+                    <div v-else-if="error" class="alert alert-danger">
+                        {{ error }}
                     </div>
 
                     <div v-else-if="users.length === 0" class="empty-state">
@@ -679,12 +696,11 @@
                         <p>暂无用户数据</p>
                     </div>
 
-                    <div v-else class="table-container">
-                        <table>
+                    <div v-else class="table-responsive">
+                        <table class="table">
                             <thead>
                                 <tr>
-                                    <th>用户 ID</th>
-                                    <th>昵称</th>
+                                    <th>用户</th>
                                     <th>余额</th>
                                     <th>状态</th>
                                     <th>最后活跃</th>
@@ -693,48 +709,54 @@
                             </thead>
                             <tbody>
                                 <tr v-for="user in users" :key="user.userId">
-                                    <td><code>{{ user.userId }}</code></td>
-                                    <td>{{ user.nickname || '未知' }}</td>
-                                    <td><strong>{{ formatMoney(user.balance || 0) }}</strong></td>
                                     <td>
-                                        <span v-if="isVip(user)" class="badge badge-vip">
-                                            <i class="fas fa-crown"></i> VIP
-                                        </span>
-                                        <span v-if="isJailed(user)" class="badge badge-jailed">
-                                            <i class="fas fa-lock"></i> 监禁中
-                                        </span>
-                                        <span v-if="user.currentCrop" class="badge badge-crop">
-                                            <i class="fas fa-seedling"></i> {{ user.currentCrop }}
-                                        </span>
+                                        <div class="user-cell">
+                                            <div class="user-avatar-sm">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            <div>
+                                                <div class="user-name">{{ user.nickname || '未知用户' }}</div>
+                                                <div class="user-id">{{ user.userId }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ formatMoney(user.balance) }}</td>
+                                    <td>
+                                        <div class="status-badges">
+                                            <span v-if="isVip(user)" class="badge badge-vip">VIP</span>
+                                            <span v-if="isJailed(user)" class="badge badge-jailed">监禁</span>
+                                            <span v-if="user.currentCrop" class="badge badge-crop">种植中</span>
+                                            <span v-if="!isVip(user) && !isJailed(user) && !user.currentCrop"
+                                                class="badge badge-normal">正常</span>
+                                        </div>
                                     </td>
                                     <td>{{ formatTime(user.lastActiveTime) }}</td>
                                     <td>
-                                        <button class="action-btn btn-money" @click="manageMoney(user)" title="管理金币">
-                                            <i class="fas fa-coins"></i>
-                                        </button>
-                                        <button class="action-btn btn-vip" @click="manageVip(user)" title="管理VIP">
-                                            <i class="fas fa-crown"></i>
-                                        </button>
-                                        <button class="action-btn btn-jail" @click="manageJail(user)" title="管理监禁">
-                                            <i class="fas fa-lock"></i>
-                                        </button>
-                                        <button class="action-btn btn-plant" @click="openPlantModal(user)" title="种地">
-                                            <i class="fas fa-seedling"></i>
-                                        </button>
+                                        <div class="action-buttons">
+                                            <button class="btn-icon" title="修改金币" @click="manageMoney(user)">
+                                                <i class="fas fa-coins"></i>
+                                            </button>
+                                            <button class="btn-icon" title="VIP管理" @click="manageVip(user)">
+                                                <i class="fas fa-crown"></i>
+                                            </button>
+                                            <button class="btn-icon" title="监禁管理" @click="manageJail(user)">
+                                                <i class="fas fa-gavel"></i>
+                                            </button>
+                                            <button class="btn-icon" title="种地" @click="openPlantModal(user)">
+                                                <i class="fas fa-seedling"></i>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <div class="pagination" v-if="users.length > 0">
-                        <button class="page-btn" @click="prevPage" :disabled="currentPage === 1">
-                            <i class="fas fa-chevron-left"></i> 上一页
-                        </button>
-                        <span class="page-info">第 {{ currentPage }} 页 / 共 {{ totalPages }} 页</span>
-                        <button class="page-btn" @click="nextPage" :disabled="currentPage >= totalPages">
-                            下一页 <i class="fas fa-chevron-right"></i>
-                        </button>
+                    <div class="pagination" v-if="totalPages > 1">
+                        <button class="btn btn-secondary" :disabled="currentPage === 1" @click="prevPage">上一页</button>
+                        <span>第 {{ currentPage }} / {{ totalPages }} 页</span>
+                        <button class="btn btn-secondary" :disabled="currentPage === totalPages"
+                            @click="nextPage">下一页</button>
                     </div>
                 </div>
             </div>
@@ -750,15 +772,26 @@
                     <h2 class="card-title" style="margin-bottom: 20px;">登录个人中心</h2>
                     <div class="form-group">
                         <label class="form-label">用户 ID</label>
-                        <input type="text" class="form-input" v-model="loginUserId" placeholder="例如: 123456"
-                            @keyup.enter="login">
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" class="form-input" v-model="loginUserId" placeholder="例如: 123456"
+                                @keyup.enter="login">
+                            <button class="btn btn-secondary" @click="getVerificationCode"
+                                :disabled="codeCooldown > 0 || !loginUserId">
+                                {{ codeCooldown > 0 ? `${codeCooldown}s` : '获取验证码' }}
+                            </button>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">登录令牌 (Token)</label>
-                        <input type="password" class="form-input" v-model="loginToken" placeholder="请输入令牌"
+                        <label class="form-label">密码 / 验证码</label>
+                        <input type="password" class="form-input" v-model="loginToken" placeholder="请输入密码或 6 位验证码"
                             @keyup.enter="login">
+                        <p v-if="loginTimestamp"
+                            style="font-size: 14px; color: #2ecc71; margin-top: 4px; font-weight: bold;">
+                            请求编号 (时间戳): {{ loginTimestamp }}
+                        </p>
                         <p style="font-size: 12px; color: #7f8c8d; margin-top: 4px;">
-                            提示: 请在群内发送指令 <code>webui</code> 获取登录令牌
+                            未设置密码请点击"获取验证码"，机器人将在群内发送验证码。
+                            <br>请核对群消息中的时间戳与上方一致。
                         </p>
                     </div>
                     <button class="btn btn-primary" style="width: 100%; justify-content: center;" @click="login"
@@ -779,9 +812,14 @@
                                     <p>ID: {{ currentUser.userId }}</p>
                                 </div>
                             </div>
-                            <button class="btn btn-secondary" @click="logout">
-                                <i class="fas fa-sign-out-alt"></i> 退出
-                            </button>
+                            <div class="header-actions">
+                                <button class="btn btn-secondary" @click="openPasswordModal(false)">
+                                    <i class="fas fa-key"></i> 修改密码
+                                </button>
+                                <button class="btn btn-secondary" @click="logout">
+                                    <i class="fas fa-sign-out-alt"></i> 退出
+                                </button>
+                            </div>
                         </div>
 
                         <div class="stats-grid" style="margin-bottom: 0;">
@@ -861,6 +899,34 @@
                 </div>
             </div>
         </div>
+
+        <!-- Password Modal -->
+        <div class="modal-overlay" v-if="showPasswordModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">{{ isForcedPasswordChange ? '请设置新密码' : '修改密码' }}</div>
+                    <div class="modal-close" v-if="!isForcedPasswordChange" @click="closePasswordModal">&times;</div>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning" v-if="isForcedPasswordChange">
+                        <i class="fas fa-exclamation-triangle"></i> 为了您的账户安全，使用临时令牌登录后必须设置密码。
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">新密码</label>
+                        <input type="password" class="form-input" v-model="newPassword" placeholder="至少 6 位字符">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">确认新密码</label>
+                        <input type="password" class="form-input" v-model="confirmPassword" placeholder="再次输入新密码">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" v-if="!isForcedPasswordChange"
+                        @click="closePasswordModal">取消</button>
+                    <button class="btn btn-primary" @click="submitPassword">确定</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -891,7 +957,17 @@
                     // Personal Center
                     loginUserId: '',
                     loginToken: '',
-                    currentUser: null
+                    loginTimestamp: '',
+                    codeCooldown: 0,
+                    currentUser: null,
+                    // Password
+                    showPasswordModal: false,
+                    isForcedPasswordChange: false,
+                    newPassword: '',
+                    confirmPassword: '',
+                    // Admin
+                    adminToken: '',
+                    inputAdminToken: ''
                 };
             },
             mounted() {
@@ -905,10 +981,15 @@
                     this.loginToken = savedToken;
                     this.fetchUser(savedUserId, savedToken);
                 }
+                // Check local storage for admin token
+                const savedAdminToken = localStorage.getItem('slave_market_admin_token');
+                if (savedAdminToken) {
+                    this.adminToken = savedAdminToken;
+                }
             },
             watch: {
                 currentView(newView) {
-                    if (newView === 'users') {
+                    if (newView === 'users' && this.adminToken) {
                         this.loadUsers();
                     } else if (newView === 'personal' && this.currentUser) {
                         this.fetchUser(this.currentUser.userId, this.loginToken); // Refresh data
@@ -918,7 +999,7 @@
             methods: {
                 async loadData() {
                     await this.loadStats();
-                    if (this.currentView === 'users') {
+                    if (this.currentView === 'users' && this.adminToken) {
                         await this.loadUsers();
                     }
                 },
@@ -937,13 +1018,15 @@
                     }
                 },
                 async loadUsers() {
+                    if (!this.adminToken) return;
                     this.loading = true;
                     this.error = null;
                     try {
                         const params = new URLSearchParams({
                             page: this.currentPage,
                             pageSize: this.pageSize,
-                            search: this.searchQuery
+                            search: this.searchQuery,
+                            adminToken: this.adminToken
                         });
                         const response = await fetch('/slave-market/api/users?' + params);
                         const data = await response.json();
@@ -951,7 +1034,13 @@
                             this.users = data.data;
                             this.totalPages = Math.ceil(data.total / this.pageSize);
                         } else {
-                            this.error = '加载用户数据失败: ' + data.message;
+                            if (response.status === 403) {
+                                this.adminToken = ''; // Token invalid
+                                localStorage.removeItem('slave_market_admin_token');
+                                this.error = '管理员令牌无效或已过期';
+                            } else {
+                                this.error = '加载用户数据失败: ' + data.message;
+                            }
                         }
                     } catch (err) {
                         this.error = '加载用户数据失败: ' + err.message;
@@ -1049,6 +1138,8 @@
                     const body = { cropName: this.selectedCrop };
                     if (isSelf) {
                         body.token = this.loginToken;
+                    } else if (this.adminToken) {
+                        body.adminToken = this.adminToken;
                     }
 
                     try {
@@ -1061,7 +1152,7 @@
                         if (data.success) {
                             alert('✅ ' + data.message);
                             this.closePlantModal();
-                            this.loadUsers();
+                            if (this.adminToken) this.loadUsers();
                             if (isSelf) {
                                 this.fetchUser(this.currentUser.userId, this.loginToken);
                             }
@@ -1077,7 +1168,7 @@
                         const response = await fetch(`/slave-market/api/users/${userId}/money`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ amount, mode: 'set' })
+                            body: JSON.stringify({ amount, mode: 'set', adminToken: this.adminToken })
                         });
                         const data = await response.json();
                         if (data.success) {
@@ -1095,7 +1186,7 @@
                         const response = await fetch(`/slave-market/api/users/${userId}/vip`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ duration })
+                            body: JSON.stringify({ duration, adminToken: this.adminToken })
                         });
                         const data = await response.json();
                         if (data.success) {
@@ -1113,7 +1204,7 @@
                         const response = await fetch(`/slave-market/api/users/${userId}/jail`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ jailed })
+                            body: JSON.stringify({ jailed, adminToken: this.adminToken })
                         });
                         const data = await response.json();
                         if (data.success) {
@@ -1127,9 +1218,40 @@
                     }
                 },
                 // Personal Center Methods
+                async getVerificationCode() {
+                    if (!this.loginUserId) {
+                        alert('请输入用户 ID');
+                        return;
+                    }
+                    this.loading = true;
+                    try {
+                        const response = await fetch('/slave-market/api/auth/code', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ userId: this.loginUserId })
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            this.loginTimestamp = data.timestamp;
+                            alert('✅ 验证码已发送到您的群聊，请核对时间戳并输入验证码。');
+                            // Start cooldown
+                            this.codeCooldown = 60;
+                            const timer = setInterval(() => {
+                                this.codeCooldown--;
+                                if (this.codeCooldown <= 0) clearInterval(timer);
+                            }, 1000);
+                        } else {
+                            alert('❌ 获取失败: ' + data.message);
+                        }
+                    } catch (err) {
+                        alert('❌ 获取失败: ' + err.message);
+                    } finally {
+                        this.loading = false;
+                    }
+                },
                 async login() {
                     if (!this.loginUserId || !this.loginToken) {
-                        alert('请输入用户 ID 和令牌');
+                        alert('请输入用户 ID 和密码/验证码');
                         return;
                     }
                     this.loading = true;
@@ -1144,6 +1266,7 @@
                     this.currentUser = null;
                     this.loginUserId = '';
                     this.loginToken = '';
+                    this.loginTimestamp = '';
                     localStorage.removeItem('slave_market_user_id');
                     localStorage.removeItem('slave_market_user_token');
                 },
@@ -1154,6 +1277,10 @@
                         const data = await response.json();
                         if (data.success) {
                             this.currentUser = data.data;
+                            // Check for forced password change
+                            if (data.authType === 'OTP') {
+                                this.openPasswordModal(true);
+                            }
                         } else {
                             alert('登录失败: ' + data.message);
                             this.logout();
@@ -1181,6 +1308,55 @@
                     } catch (err) {
                         alert('❌ 收获失败: ' + err.message);
                     }
+                },
+                // Password Management
+                openPasswordModal(forced) {
+                    this.isForcedPasswordChange = forced;
+                    this.newPassword = '';
+                    this.confirmPassword = '';
+                    this.showPasswordModal = true;
+                },
+                closePasswordModal() {
+                    if (this.isForcedPasswordChange) return; // Cannot close if forced
+                    this.showPasswordModal = false;
+                },
+                async submitPassword() {
+                    if (this.newPassword.length < 6) {
+                        alert('密码长度至少为 6 位');
+                        return;
+                    }
+                    if (this.newPassword !== this.confirmPassword) {
+                        alert('两次输入的密码不一致');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(`/slave-market/api/users/${this.currentUser.userId}/password`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                token: this.loginToken,
+                                newPassword: this.newPassword
+                            })
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            alert('✅ 密码设置成功！请使用新密码重新登录。');
+                            this.showPasswordModal = false;
+                            this.logout();
+                        } else {
+                            alert('❌ 设置失败: ' + data.message);
+                        }
+                    } catch (err) {
+                        alert('❌ 设置失败: ' + err.message);
+                    }
+                },
+                // Admin Methods
+                loginAdmin() {
+                    if (!this.inputAdminToken) return;
+                    this.adminToken = this.inputAdminToken;
+                    localStorage.setItem('slave_market_admin_token', this.adminToken);
+                    this.loadUsers();
                 }
             }
         }).mount('#app');
