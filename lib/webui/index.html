@@ -668,7 +668,7 @@
                     return user.vipEndTime && user.vipEndTime > Date.now();
                 },
                 isJailed(user) {
-                    return user.jailEndTime && user.jailEndTime > Date.now();
+                    return user.prisonEndTime && user.prisonEndTime > Date.now();
                 },
                 formatMoney(amount) {
                     return amount.toLocaleString('zh-CN');
