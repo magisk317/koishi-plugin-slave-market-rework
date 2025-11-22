@@ -295,6 +295,8 @@
             border-radius: 12px;
             font-size: 12px;
             font-weight: 600;
+            margin-right: 4px;
+            margin-bottom: 4px;
         }
 
         .badge-vip {
@@ -305,6 +307,11 @@
         .badge-jailed {
             background: #f8d7da;
             color: #721c24;
+        }
+
+        .badge-crop {
+            background: #e8f5e9;
+            color: #2e7d32;
         }
 
         .action-btn {
@@ -472,7 +479,8 @@
             font-weight: 500;
         }
 
-        .form-select {
+        .form-select,
+        .form-input {
             width: 100%;
             padding: 10px;
             border: 1px solid #dfe6e9;
@@ -494,6 +502,74 @@
         .btn-secondary:hover {
             background: #7f8c8d;
         }
+
+        /* Personal Center */
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            text-align: center;
+        }
+
+        .user-dashboard {
+            display: grid;
+            gap: 24px;
+        }
+
+        .user-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-avatar {
+            width: 64px;
+            height: 64px;
+            background: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .user-info h2 {
+            margin-bottom: 4px;
+            color: #2c3e50;
+        }
+
+        .user-info p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .farm-status {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .farm-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .farm-progress {
+            height: 8px;
+            background: #dfe6e9;
+            border-radius: 4px;
+            margin: 16px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #2ecc71;
+            transition: width 0.3s;
+        }
     </style>
 </head>
 
@@ -514,6 +590,10 @@
                 <div class="nav-item" :class="{ active: currentView === 'users' }" @click="currentView = 'users'">
                     <i class="fas fa-users"></i>
                     <span>用户管理</span>
+                </div>
+                <div class="nav-item" :class="{ active: currentView === 'personal' }" @click="currentView = 'personal'">
+                    <i class="fas fa-user-circle"></i>
+                    <span>个人中心</span>
                 </div>
             </nav>
         </div>
@@ -623,8 +703,7 @@
                                         <span v-if="isJailed(user)" class="badge badge-jailed">
                                             <i class="fas fa-lock"></i> 监禁中
                                         </span>
-                                        <span v-if="user.currentCrop" class="badge"
-                                            style="background: #e8f5e9; color: #2e7d32;">
+                                        <span v-if="user.currentCrop" class="badge badge-crop">
                                             <i class="fas fa-seedling"></i> {{ user.currentCrop }}
                                         </span>
                                     </td>
@@ -656,6 +735,96 @@
                         <button class="page-btn" @click="nextPage" :disabled="currentPage >= totalPages">
                             下一页 <i class="fas fa-chevron-right"></i>
                         </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal Center View -->
+            <div v-if="currentView === 'personal'">
+                <div class="page-header">
+                    <h1 class="page-title">个人中心</h1>
+                    <p class="page-subtitle">管理你的个人资产和农场</p>
+                </div>
+
+                <div v-if="!currentUser" class="content-card login-container">
+                    <h2 class="card-title" style="margin-bottom: 20px;">登录个人中心</h2>
+                    <div class="form-group">
+                        <label class="form-label">请输入你的用户 ID</label>
+                        <input type="text" class="form-input" v-model="loginUserId" placeholder="例如: 123456"
+                            @keyup.enter="login">
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%; justify-content: center;" @click="login"
+                        :disabled="loading">
+                        <i class="fas fa-sign-in-alt"></i> 登录
+                    </button>
+                </div>
+
+                <div v-else class="user-dashboard">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <div class="user-header">
+                                <div class="user-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="user-info">
+                                    <h2>{{ currentUser.nickname || '未知用户' }}</h2>
+                                    <p>ID: {{ currentUser.userId }}</p>
+                                </div>
+                            </div>
+                            <button class="btn btn-secondary" @click="logout">
+                                <i class="fas fa-sign-out-alt"></i> 退出
+                            </button>
+                        </div>
+
+                        <div class="stats-grid" style="margin-bottom: 0;">
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <span class="stat-label">余额</span>
+                                    <div class="stat-icon"><i class="fas fa-coins"></i></div>
+                                </div>
+                                <div class="stat-value">{{ formatMoney(currentUser.balance || 0) }}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <span class="stat-label">状态</span>
+                                    <div class="stat-icon"><i class="fas fa-id-card"></i></div>
+                                </div>
+                                <div class="stat-value" style="font-size: 16px;">
+                                    <span v-if="isVip(currentUser)" class="badge badge-vip"><i class="fas fa-crown"></i>
+                                        VIP</span>
+                                    <span v-if="isJailed(currentUser)" class="badge badge-jailed"><i
+                                            class="fas fa-lock"></i> 监禁中</span>
+                                    <span v-if="!isVip(currentUser) && !isJailed(currentUser)">普通用户</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h2 class="card-title">我的农场</h2>
+                            <button v-if="currentUser.currentCrop" class="btn btn-primary" @click="harvestCrop">
+                                <i class="fas fa-sickle"></i> 收获
+                            </button>
+                            <button v-else class="btn btn-plant" @click="openPlantModal(currentUser)">
+                                <i class="fas fa-seedling"></i> 种植
+                            </button>
+                        </div>
+
+                        <div v-if="currentUser.currentCrop" class="farm-status">
+                            <div class="farm-icon">🌱</div>
+                            <h3>正在种植: {{ currentUser.currentCrop }}</h3>
+                            <p>开始时间: {{ formatTime(currentUser.cropStartTime) }}</p>
+                            <!-- Simple progress bar simulation (would need real growth time from backend to be accurate) -->
+                            <div class="farm-progress">
+                                <div class="progress-bar" style="width: 50%"></div>
+                            </div>
+                            <p class="page-info">请留意作物生长状态，及时收获！</p>
+                        </div>
+                        <div v-else class="empty-state" style="padding: 40px;">
+                            <i class="fas fa-seedling"></i>
+                            <p>土地闲置中，快去种点什么吧！</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -710,17 +879,27 @@
                     searchTimeout: null,
                     showPlantModal: false,
                     selectedUser: null,
-                    selectedCrop: ''
+                    selectedCrop: '',
+                    // Personal Center
+                    loginUserId: '',
+                    currentUser: null
                 };
             },
             mounted() {
                 this.loadData();
                 this.loadCrops();
+                // Check local storage for login
+                const savedUserId = localStorage.getItem('slave_market_user_id');
+                if (savedUserId) {
+                    this.fetchUser(savedUserId);
+                }
             },
             watch: {
                 currentView(newView) {
                     if (newView === 'users') {
                         this.loadUsers();
+                    } else if (newView === 'personal' && this.currentUser) {
+                        this.fetchUser(this.currentUser.userId); // Refresh data
                     }
                 }
             },
@@ -864,6 +1043,9 @@
                             alert('✅ ' + data.message);
                             this.closePlantModal();
                             this.loadUsers();
+                            if (this.currentUser && this.currentUser.userId === this.selectedUser.userId) {
+                                this.fetchUser(this.currentUser.userId);
+                            }
                         } else {
                             alert('❌ 种植失败: ' + data.message);
                         }
@@ -923,6 +1105,53 @@
                         }
                     } catch (err) {
                         alert('❌ 更新失败: ' + err.message);
+                    }
+                },
+                // Personal Center Methods
+                async login() {
+                    if (!this.loginUserId) return;
+                    this.loading = true;
+                    await this.fetchUser(this.loginUserId);
+                    this.loading = false;
+                    if (this.currentUser) {
+                        localStorage.setItem('slave_market_user_id', this.loginUserId);
+                    }
+                },
+                logout() {
+                    this.currentUser = null;
+                    this.loginUserId = '';
+                    localStorage.removeItem('slave_market_user_id');
+                },
+                async fetchUser(userId) {
+                    try {
+                        const response = await fetch(`/slave-market/api/users/${userId}`);
+                        const data = await response.json();
+                        if (data.success) {
+                            this.currentUser = data.data;
+                        } else {
+                            alert('用户不存在');
+                            this.logout();
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        alert('登录失败: ' + err.message);
+                    }
+                },
+                async harvestCrop() {
+                    if (!this.currentUser) return;
+                    try {
+                        const response = await fetch(`/slave-market/api/users/${this.currentUser.userId}/harvest`, {
+                            method: 'POST'
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            alert('✅ ' + data.message);
+                            this.fetchUser(this.currentUser.userId);
+                        } else {
+                            alert('❌ 收获失败: ' + data.message);
+                        }
+                    } catch (err) {
+                        alert('❌ 收获失败: ' + err.message);
                     }
                 }
             }
